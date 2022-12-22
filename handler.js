@@ -2,6 +2,8 @@ import { writeFileSync } from 'fs';
 import { DynamoDB } from 'aws-sdk';
 
 const { DYNAMODB_TABLE } = process.env;
+const { SLEEP } = process.env;
+const { BATCH_SIZE } = process.env;
 
 const dynamo = new DynamoDB.DocumentClient();
 
@@ -31,7 +33,7 @@ function batchWrite(items) {
     },
   };
   console.log({ params });
-  sleep(1000);
+  sleep(SLEEP);
   return dynamo.batchWrite(params).promise();
 }
 
@@ -61,7 +63,7 @@ export async function exportToJSON() {
 export async function importFromJSON() {
   const { default: items } = await import('./results/data.json');
 
-  const batchSize = 1;
+  const batchSize = BATCH_SIZE;
   const batchItems = new Array(Math.ceil(items.length / batchSize))
     .fill()
     .map((_, i) => items.slice(i * batchSize, i * batchSize + batchSize));
