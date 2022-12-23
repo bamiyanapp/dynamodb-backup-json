@@ -32,7 +32,7 @@ function batchWrite(items) {
       })),
     },
   };
-  console.log({ params });
+//  console.log({ params });
   sleep(SLEEP);
   return dynamo.batchWrite(params).promise();
 }
@@ -47,7 +47,7 @@ async function getAll(lastEvaluatedKey) {
 }
 
 function writeToJSON(filename, data) {
-  console.log({ filename, count: data.length });
+//  console.log({ filename, count: data.length });
   writeFileSync(filename, JSON.stringify(data));
 }
 
@@ -62,7 +62,7 @@ export async function exportToJSON() {
 
 export async function importFromJSON() {
   const { default: items } = await import('./results/data.json');
-
+  const startTime = Date.now(); // 開始時間
   const batchSize = BATCH_SIZE;
   const batchItems = new Array(Math.ceil(items.length / batchSize))
     .fill()
@@ -72,5 +72,8 @@ export async function importFromJSON() {
   console.log(batchItems.length);
   const results = await Promise.all(batchItems.map(items => batchWrite(items)));
   console.dir({ results }, { depth: null });
+  const endTime = Date.now(); // 終了時間
+  console.log("--------------------------------");
+  console.log(endTime - startTime); // 何ミリ秒かかったかを表示する
   return { statusCode: 200 };
 }
